@@ -7,16 +7,20 @@
     <style>
         body { font-family: sans-serif; background-color: #0b192c; color: white; text-align: center; padding: 50px; }
         .container { max-width: 500px; margin: 0 auto; background-color: #1a2a40; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .logo-marca { max-width: 250px; margin-bottom: 20px; border-radius: 8px; }
         h1 { color: #d48a5c; margin-bottom: 10px; } /* Cor Cobre da logo */
         p { color: #8fa0b5; font-size: 14px; margin-bottom: 30px; }
         input[type="file"] { margin: 20px 0; color: #fff; }
-        button { background-color: #3b9b9b; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; width: 100%; }
+        button { background-color: #3b9b9b; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; width: 100%; transition: background-color 0.3s; }
         button:hover { background-color: #2a7a7a; }
         #status { margin-top: 20px; font-weight: bold; color: #d48a5c; }
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- Aqui está a logo inserida puxando direto do seu GitHub -->
+        <img src="logo.jpg" alt="Logo CupomClic" class="logo-marca">
+        
         <h1>Estúdio CupomClic</h1>
         <p>A inteligência artificial que transforma as fotos da sua loja.</p>
         
@@ -38,8 +42,6 @@
 
             status.innerText = "Transformando a imagem... aguarde.";
 
-            // O Truque Mágico: Transformamos a foto em texto (Base64) 
-            // Assim a Vercel não precisa de pacotes complicados para ler o arquivo!
             const reader = new FileReader();
             reader.readAsDataURL(input.files[0]);
             
@@ -47,7 +49,6 @@
                 const fotoTextoBase64 = reader.result;
 
                 try {
-                    // Enviamos para a Vercel de forma limpa e direta
                     const resposta = await fetch('/api/gerar', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },

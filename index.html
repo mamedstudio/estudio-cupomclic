@@ -18,29 +18,44 @@
 </head>
 <body>
     <div class="container">
-        <!-- Aqui está a mágica: a extensão corrigida para .png -->
         <img src="logo.png" alt="Logo CupomClic" class="logo-marca">
         
         <h1>Estúdio CupomClic</h1>
         <p>A inteligência artificial que transforma as fotos da sua loja.</p>
         
-        <input type="file" id="fotoInput" accept="image/*">
+        <!-- Adicionamos o 'onchange' para detectar quando a foto é escolhida -->
+        <input type="file" id="fotoInput" accept="image/*" onchange="fotoAnexada()">
         <button onclick="enviarFoto()">Gerar Foto Profissional</button>
 
         <p id="status"></p>
     </div>
 
     <script>
+        // Função que dá o aviso assim que o arquivo é selecionado
+        function fotoAnexada() {
+            const input = document.getElementById('fotoInput');
+            const status = document.getElementById('status');
+            
+            if (input.files.length > 0) {
+                status.innerText = "FOTO ANEXADA COM SUCESSO. CLIQUE EM GERAR";
+                status.style.color = "#3b9b9b"; // Cor Verde Água para dar sensação de Sucesso
+            } else {
+                status.innerText = "";
+            }
+        }
+
         function enviarFoto() {
             const input = document.getElementById('fotoInput');
             const status = document.getElementById('status');
             
             if (!input.files[0]) {
                 status.innerText = "Nenhuma foto selecionada!";
+                status.style.color = "#d48a5c"; // Volta pra cor cobre original em caso de erro
                 return;
             }
 
             status.innerText = "Transformando a imagem... aguarde.";
+            status.style.color = "#d48a5c";
 
             const reader = new FileReader();
             reader.readAsDataURL(input.files[0]);

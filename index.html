@@ -13,9 +13,12 @@
         input[type="file"] { margin: 20px 0; color: #fff; }
         button { background-color: #3b9b9b; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; width: 100%; transition: background-color 0.3s; }
         button:hover { background-color: #2a7a7a; }
+        .btn-baixar { background-color: #d48a5c; margin-top: 15px; }
+        .btn-baixar:hover { background-color: #b37143; }
         #status { margin-top: 20px; font-weight: bold; color: #d48a5c; }
         .resultado-container { margin-top: 30px; display: none; }
         .resultado-img { max-width: 100%; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); border: 2px solid #d48a5c; }
+        .dica-mobile { font-size: 11px; color: #8fa0b5; margin-top: 8px; font-style: italic; }
     </style>
 </head>
 <body>
@@ -33,6 +36,10 @@
         <div id="resultadoBloco" class="resultado-container">
             <h3>Seu Anúncio Profissional:</h3>
             <img id="fotoResultado" src="" alt="Produto CupomClic" class="resultado-img">
+            
+            <!-- Novo Botão de Download instalado aqui -->
+            <button onclick="baixarFoto()" class="btn-baixar">Baixar Imagem no Celular</button>
+            <p class="dica-mobile">Dica: Você também pode pressionar e segurar o dedo na imagem para salvá-la!</p>
         </div>
     </div>
 
@@ -74,12 +81,10 @@
                 img.src = reader.result;
                 
                 img.onload = async function() {
-                    // Criamos um conversor em memória
                     const canvas = document.createElement('canvas');
                     let width = img.width;
                     let height = img.height;
                     
-                    // Redimensionamos proporcionalmente para não estourar os limites da Vercel
                     const MAX_WIDTH = 1024;
                     const MAX_HEIGHT = 1024;
                     if (width > MAX_WIDTH || height > MAX_HEIGHT) {
@@ -97,7 +102,6 @@
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
                     
-                    // A MÁGICA: Transforma qualquer formato (.jfif, .png) em JPEG padrão puro
                     const fotoTextoBase64 = canvas.toDataURL('image/jpeg', 0.85);
 
                     try {
@@ -122,6 +126,19 @@
                     }
                 };
             };
+        }
+
+        // Função responsável pelo download limpo da imagem gerada
+        function baixarFoto() {
+            const imgResultado = document.getElementById('fotoResultado');
+            if (!imgResultado.src) return;
+            
+            const linkTemporario = document.createElement('a');
+            linkTemporario.href = imgResultado.src;
+            linkTemporario.download = 'anuncio-cupomclic.jpg';
+            document.body.appendChild(linkTemporario);
+            linkTemporario.click();
+            document.body.removeChild(linkTemporario);
         }
     </script>
 </body>

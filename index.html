@@ -20,7 +20,6 @@
 </head>
 <body>
     <div class="container">
-        <!-- Caso a imagem quebre, confirme se o arquivo da sua logo está no repositório com o nome exato logo.png -->
         <img src="logo.png" alt="Logo CupomClic" class="logo-marca">
         
         <h1>Estúdio CupomClic</h1>
@@ -31,7 +30,6 @@
 
         <p id="status"></p>
 
-        <!-- Bloco que armazena a foto generativa finalizada -->
         <div id="resultadoBloco" class="resultado-container">
             <h3>Seu Anúncio Profissional:</h3>
             <img id="fotoResultado" src="" alt="Produto CupomClic" class="resultado-img">
@@ -71,29 +69,58 @@
             const reader = new FileReader();
             reader.readAsDataURL(input.files[0]);
             
-            reader.onload = async function () {
-                const fotoTextoBase64 = reader.result;
-
-                try {
-                    const resposta = await fetch('/api/gerar', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ imagem: fotoTextoBase64 })
-                    });
+            reader.onload = function () {
+                const img = new Image();
+                img.src = reader.result;
+                
+                img.onload = async function() {
+                    // Criamos um conversor em memória
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
                     
-                    const resultado = await resposta.json();
-                    
-                    if (resultado.imagemResultado) {
-                        status.innerText = resultado.mensagem;
-                        status.style.color = "#3b9b9b";
-                        imgResultado.src = resultado.imagemResultado;
-                        bloco.style.display = "block";
-                    } else {
-                        status.innerText = resultado.erro || "Erro ao processar imagem.";
+                    // Redimensionamos proporcionalmente para não estourar os limites da Vercel
+                    const MAX_WIDTH = 1024;
+                    const MAX_HEIGHT = 1024;
+                    if (width > MAX_WIDTH || height > MAX_HEIGHT) {
+                        if (width > height) {
+                            height *= MAX_WIDTH / width;
+                            width = MAX_WIDTH;
+                        } else {
+                            width *= MAX_HEIGHT / height;
+                            height = MAX_HEIGHT;
+                        }
                     }
-                } catch (erro) {
-                    status.innerText = "Erro na comunicação com a IA.";
-                }
+                    
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    // A MÁGICA: Transforma qualquer formato (.jfif, .png) em JPEG padrão puro
+                    const fotoTextoBase64 = canvas.toDataURL('image/jpeg', 0.85);
+
+                    try {
+                        const resposta = await fetch('/api/gerar', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ imagem: fotoTextoBase64 })
+                        });
+                        
+                        const resultado = await resposta.json();
+                        
+                        if (resultado.imagemResultado) {
+                            status.innerText = resultado.mensagem;
+                            status.style.color = "#3b9b9b";
+                            imgResultado.src = resultado.imagemResultado;
+                            bloco.style.display = "block";
+                        } else {
+                            status.innerText = resultado.erro || "Erro ao processar imagem.";
+                        }
+                    } catch (erro) {
+                        status.innerText = "Erro na comunicação com a IA.";
+                    }
+                };
             };
         }
     </script>

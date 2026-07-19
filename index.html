@@ -20,6 +20,7 @@
 </head>
 <body>
     <div class="container">
+        <!-- Caso a imagem quebre, confirme se o arquivo da sua logo está no repositório com o nome exato logo.png -->
         <img src="logo.png" alt="Logo CupomClic" class="logo-marca">
         
         <h1>Estúdio CupomClic</h1>
@@ -30,6 +31,7 @@
 
         <p id="status"></p>
 
+        <!-- Bloco que armazena a foto generativa finalizada -->
         <div id="resultadoBloco" class="resultado-container">
             <h3>Seu Anúncio Profissional:</h3>
             <img id="fotoResultado" src="" alt="Produto CupomClic" class="resultado-img">
@@ -73,7 +75,6 @@
                 const fotoTextoBase64 = reader.result;
 
                 try {
-                    // Rota corrigida com precisão milimétrica aqui:
                     const resposta = await fetch('/api/gerar', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },

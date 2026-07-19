@@ -8,12 +8,14 @@
         body { font-family: sans-serif; background-color: #0b192c; color: white; text-align: center; padding: 50px; }
         .container { max-width: 500px; margin: 0 auto; background-color: #1a2a40; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
         .logo-marca { max-width: 250px; margin-bottom: 20px; border-radius: 8px; }
-        h1 { color: #d48a5c; margin-bottom: 10px; } /* Cor Cobre da logo */
+        h1 { color: #d48a5c; margin-bottom: 10px; }
         p { color: #8fa0b5; font-size: 14px; margin-bottom: 30px; }
         input[type="file"] { margin: 20px 0; color: #fff; }
         button { background-color: #3b9b9b; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; width: 100%; transition: background-color 0.3s; }
         button:hover { background-color: #2a7a7a; }
         #status { margin-top: 20px; font-weight: bold; color: #d48a5c; }
+        .resultado-container { margin-top: 30px; display: none; }
+        .resultado-img { max-width: 100%; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); border: 2px solid #d48a5c; }
     </style>
 </head>
 <body>
@@ -23,22 +25,28 @@
         <h1>Estúdio CupomClic</h1>
         <p>A inteligência artificial que transforma as fotos da sua loja.</p>
         
-        <!-- Adicionamos o 'onchange' para detectar quando a foto é escolhida -->
         <input type="file" id="fotoInput" accept="image/*" onchange="fotoAnexada()">
         <button onclick="enviarFoto()">Gerar Foto Profissional</button>
 
         <p id="status"></p>
+
+        <!-- Área oculta que vai aparecer exibindo o anúncio profissional pronto -->
+        <div id="resultadoBloco" class="resultado-container">
+            <h3>Seu Anúncio Profissional:</h3>
+            <img id="fotoResultado" src="" alt="Produto CupomClic" class="resultado-img">
+        </div>
     </div>
 
     <script>
-        // Função que dá o aviso assim que o arquivo é selecionado
         function fotoAnexada() {
             const input = document.getElementById('fotoInput');
             const status = document.getElementById('status');
+            const bloco = document.getElementById('resultadoBloco');
             
+            bloco.style.display = "none"; // Esconde resultado anterior se houver
             if (input.files.length > 0) {
                 status.innerText = "FOTO ANEXADA COM SUCESSO. CLIQUE EM GERAR";
-                status.style.color = "#3b9b9b"; // Cor Verde Água para dar sensação de Sucesso
+                status.style.color = "#3b9b9b";
             } else {
                 status.innerText = "";
             }
@@ -47,14 +55,16 @@
         function enviarFoto() {
             const input = document.getElementById('fotoInput');
             const status = document.getElementById('status');
+            const bloco = document.getElementById('resultadoBloco');
+            const imgResultado = document.getElementById('fotoResultado');
             
             if (!input.files[0]) {
                 status.innerText = "Nenhuma foto selecionada!";
-                status.style.color = "#d48a5c"; // Volta pra cor cobre original em caso de erro
+                status.style.color = "#d48a5c";
                 return;
             }
 
-            status.innerText = "Transformando a imagem... aguarde.";
+            status.innerText = "O Estúdio CupomClic está preparando a sua imagem...";
             status.style.color = "#d48a5c";
 
             const reader = new FileReader();
@@ -64,14 +74,23 @@
                 const fotoTextoBase64 = reader.result;
 
                 try {
-                    const resposta = await fetch('/api/gerar', {
+                    const resposta = await fetch('/api/generar' || '/api/gerar', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ imagem: fotoTextoBase64 })
                     });
                     
                     const resultado = await resposta.json();
-                    status.innerText = resultado.mensagem;
+                    
+                    if (resultado.imagemResultado) {
+                        status.innerText = resultado.mensagem;
+                        status.style.color = "#3b9b9b";
+                        // Injeta a foto reformulada na tela do lojista
+                        imgResultado.src = resultado.imagemResultado;
+                        bloco.style.display = "block";
+                    } else {
+                        status.innerText = resultado.erro || "Erro ao processar imagem.";
+                    }
                 } catch (erro) {
                     status.innerText = "Erro na comunicação com a IA.";
                 }

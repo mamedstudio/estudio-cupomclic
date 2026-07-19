@@ -30,7 +30,6 @@
 
         <p id="status"></p>
 
-        <!-- Área oculta que vai aparecer exibindo o anúncio profissional pronto -->
         <div id="resultadoBloco" class="resultado-container">
             <h3>Seu Anúncio Profissional:</h3>
             <img id="fotoResultado" src="" alt="Produto CupomClic" class="resultado-img">
@@ -43,7 +42,7 @@
             const status = document.getElementById('status');
             const bloco = document.getElementById('resultadoBloco');
             
-            bloco.style.display = "none"; // Esconde resultado anterior se houver
+            bloco.style.display = "none";
             if (input.files.length > 0) {
                 status.innerText = "FOTO ANEXADA COM SUCESSO. CLIQUE EM GERAR";
                 status.style.color = "#3b9b9b";
@@ -74,7 +73,8 @@
                 const fotoTextoBase64 = reader.result;
 
                 try {
-                    const resposta = await fetch('/api/generar' || '/api/gerar', {
+                    // Rota corrigida com precisão milimétrica aqui:
+                    const resposta = await fetch('/api/gerar', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ imagem: fotoTextoBase64 })
@@ -85,7 +85,6 @@
                     if (resultado.imagemResultado) {
                         status.innerText = resultado.mensagem;
                         status.style.color = "#3b9b9b";
-                        // Injeta a foto reformulada na tela do lojista
                         imgResultado.src = resultado.imagemResultado;
                         bloco.style.display = "block";
                     } else {

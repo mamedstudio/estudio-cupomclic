@@ -20,7 +20,8 @@
         .btn-baixar { background-color: #d48a5c; margin-top: 15px; }
         .btn-baixar:hover { background-color: #b37143; }
         
-        #status { margin-top: 20px; font-weight: bold; color: #d48a5c; }
+        .aviso-tempo { color: #e6a15c; font-weight: bold; font-size: 13px; margin-top: 15px; border: 1px dashed #d48a5c; padding: 10px; border-radius: 6px; background-color: rgba(212, 138, 92, 0.1); }
+        #status { margin-top: 20px; font-weight: bold; color: #3b9b9b; }
         .resultado-container { margin-top: 30px; display: none; }
         .resultado-img { max-width: 100%; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); border: 2px solid #d48a5c; }
         .dica-mobile { font-size: 11px; color: #8fa0b5; margin-top: 8px; font-style: italic; }
@@ -36,12 +37,12 @@
         <div class="campo-grupo">
             <label for="estiloSelect">1. Escolha o Estilo de Campanha:</label>
             <select id="estiloSelect">
-                <option value="joias" selected>Joias & Luxo (Com Modelo / Editorial Vogue)</option>
-                <option value="clean">Anúncio Comercial / Outdoor (Óculos e Produtos)</option>
-                <option value="moda">Estúdio de Moda Editorial (Roupas e Calçados)</option>
-                <option value="beleza">Spa & Beleza (Cosméticos e Skincare)</option>
-                <option value="gourmet">Mármore Gourmet (Doces e Confeitaria)</option>
-                <option value="rustico">Café Rústico (Lanches e Cafés)</option>
+                <option value="joias" selected>Joias & Luxo (Com Modelo Editorial)</option>
+                <option value="clean">Outdoor & Lifestyle (Com Modelo / Óculos / Acessórios)</option>
+                <option value="moda">Estúdio Moda Vogue (Com Modelo / Roupas / Calçados)</option>
+                <option value="beleza">Spa & Beleza (Com Modelo / Cosméticos e Skincare)</option>
+                <option value="gourmet">Mármore Gourmet (Doces, Bolos e Confeitaria)</option>
+                <option value="rustico">Café Rústico (Lanches, Hambúrgueres e Cafés)</option>
             </select>
         </div>
 
@@ -50,7 +51,11 @@
             <input type="file" id="fotoInput" accept="image/*" onchange="fotoAnexada()">
         </div>
 
-        <button onclick="enviarFoto()">Gerar Anúncio Profissional</button>
+        <button onclick="enviarFoto()">Gerar Anúncio Profissional (1080x1350)</button>
+
+        <div class="aviso-tempo">
+            ⚠️ ATENÇÃO. Sua nova foto pronta de 3 a 5 minutos.
+        </div>
 
         <p id="status"></p>
 
@@ -91,7 +96,7 @@
                 return;
             }
 
-            status.innerText = "O Estúdio CupomClic está gerando a arte em alta definição...";
+            status.innerText = "O Estúdio CupomClic está criando a sua arte em formato Instagram... Aguarde de 3 a 5 min.";
             status.style.color = "#d48a5c";
 
             const reader = new FileReader();
@@ -102,28 +107,25 @@
                 img.src = reader.result;
                 
                 img.onload = async function() {
+                    // Ajuste do Canvas para Formato Instagram Vertical (Proporção 4:5 - 1080x1350)
                     const canvas = document.createElement('canvas');
-                    let width = img.width;
-                    let height = img.height;
+                    const TARGET_WIDTH = 1080;
+                    const TARGET_HEIGHT = 1350;
                     
-                    const MAX_WIDTH = 1024;
-                    const MAX_HEIGHT = 1024;
-                    if (width > MAX_WIDTH || height > MAX_HEIGHT) {
-                        if (width > height) {
-                            height *= MAX_WIDTH / width;
-                            width = MAX_WIDTH;
-                        } else {
-                            width *= MAX_HEIGHT / height;
-                            height = MAX_HEIGHT;
-                        }
-                    }
-                    
-                    canvas.width = width;
-                    canvas.height = height;
+                    canvas.width = TARGET_WIDTH;
+                    canvas.height = TARGET_HEIGHT;
                     const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
                     
-                    const fotoTextoBase64 = canvas.toDataURL('image/jpeg', 0.85);
+                    // Desenha ajustando para preencher a proporção 4:5
+                    let scale = Math.max(TARGET_WIDTH / img.width, TARGET_HEIGHT / img.height);
+                    let x = (TARGET_WIDTH / 2) - (img.width / 2) * scale;
+                    let y = (TARGET_HEIGHT / 2) - (img.height / 2) * scale;
+                    
+                    ctx.fillStyle = "#ffffff";
+                    ctx.fillRect(0, 0, TARGET_WIDTH, TARGET_HEIGHT);
+                    ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+                    
+                    const fotoTextoBase64 = canvas.toDataURL('image/jpeg', 0.90);
 
                     try {
                         const resposta = await fetch('/api/gerar', {
@@ -155,7 +157,7 @@
             
             const linkTemporario = document.createElement('a');
             linkTemporario.href = imgResultado.src;
-            linkTemporario.download = 'anuncio-cupomclic.jpg';
+            linkTemporario.download = 'anuncio-cupomclic-instagram.jpg';
             document.body.appendChild(linkTemporario);
             linkTemporario.click();
             document.body.removeChild(linkTemporario);

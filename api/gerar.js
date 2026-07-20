@@ -16,21 +16,25 @@ export default async function handler(req, res) {
       return res.status(500).json({ erro: 'Chave FAL_KEY não configurada na Vercel.' });
     }
 
-    console.log("🚀 Enviando para o motor de substituição de fundo do Fal.ai...");
+    console.log("🚀 Enviando para o motor openai/gpt-image-2/edit via Fal.ai...");
 
-    // PROMPTS FOCADOS APENAS NO CENÁRIO (Sem descrever o produto para não alterar os pixels)
-    const promptsDeCenario = {
-      clean: 'Modern luxury advertising studio background, soft neutral gradient tone, professional lighting, realistic soft shadows, 8k resolution',
-      moda: 'Vogue editorial fashion backdrop, elegant minimalist nude texture, soft studio spotlight, blurred high-fashion background',
-      beleza: 'Luxury spa backdrop, smooth glossy marble pedestal surface, subtle silk fabric drape, soft pastel lighting, water ripple bokeh',
-      gourmet: 'Luxury cafe table surface, soft side window morning light, cozy bakery blurred background, professional food presentation',
-      rustico: 'Dark rustic wood surface, warm golden hour cafe background, cozy cinematic atmosphere'
+    // PROMPTS ROBUSTOS (Engenharia de Prompt Fotográfica)
+    const promptsRobustos = {
+      clean: 'Hyper-realistic commercial product photography, resting on a flawless pristine white acrylic podium. Soft diffused softbox studio lighting, elegant reflections, clean neutral gradient background. Shot on 85mm lens, f/2.8, highly detailed, professional studio advertisement, 8k resolution.',
+      
+      moda: 'High-end fashion editorial product shot, resting on a minimalist matte concrete pedestal. Subtle warm spotlighting creating soft elegant shadows. Sophisticated neutral beige and light grey background, Vogue magazine cover aesthetic, cinematic lighting, highly detailed.',
+      
+      beleza: 'Luxury beauty and cosmetics product photography, resting on a polished rose quartz stone. Surrounded by shallow clear water ripples and soft silk fabric. Soft pastel pink and warm beige color palette, glowing luxury spa lighting, hyper-realistic macro photography.',
+      
+      gourmet: 'Award-winning gourmet food photography, resting on a luxury Italian white marble countertop. Soft morning natural sunlight streaming from the side creating appetizing highlights. Cozy upscale bakery blurred in the background, hyper-realistic, shot on 100mm macro lens, cinematic depth of field.',
+      
+      rustico: 'Artisanal cozy cafe product photography, resting on a dark rustic reclaimed wood table. Warm cinematic golden hour backlighting. Beautiful bokeh background featuring blurred warm cafe lights and coffee shop elements, hyper-realistic depth of field, 8k.'
     };
 
-    const promptEscolhido = promptsDeCenario[estilo] || promptsDeCenario.clean;
+    const promptEscolhido = promptsRobustos[estilo] || promptsRobustos.clean;
 
-    // Usamos o endpoint do Fal.ai focado em Background Replacement / Inpainting
-    const respostaIA = await fetch('https://fal.run/fal-ai/bria/background/replace', {
+    // Conexão com o motor escolhido por você (GPT-Image-2 Edit)
+    const respostaIA = await fetch('https://fal.run/openai/gpt-image-2/edit', {
       method: 'POST',
       headers: {
         'Authorization': `Key ${falKey}`,
@@ -38,27 +42,28 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         image_url: imagem,
-        prompt: promptEscolhido,
-        refine: true
+        prompt: promptEscolhido
       })
     });
 
     if (!respostaIA.ok) {
       const textoErro = await respostaIA.text();
       console.error("Erro no Fal.ai:", textoErro);
-      return res.status(500).json({ erro: `Fal.ai recuzou: ${textoErro}` });
+      return res.status(500).json({ erro: `Fal.ai recusou: ${textoErro}` });
     }
 
     const dados = await respostaIA.json();
-    const fotoFinalUrl = dados.image?.url || dados.images?.[0]?.url;
+    
+    // Captura o link da imagem retornado pela API da OpenAI/Fal
+    const fotoFinalUrl = dados.image?.url || dados.images?.[0]?.url || dados.url;
 
     if (!fotoFinalUrl) {
-      return res.status(500).json({ erro: 'O Fal.ai não retornou a imagem.' });
+      return res.status(500).json({ erro: 'A IA não retornou o link da imagem.' });
     }
 
     return res.status(200).json({ 
       sucesso: true,
-      mensagem: "Anúncio gerado com sucesso via Fal.ai!",
+      mensagem: "Anúncio hiper-realista gerado com sucesso!",
       imagemResultado: fotoFinalUrl
     });
 

@@ -34,11 +34,11 @@
         <p>A inteligência artificial que transforma as fotos da sua loja.</p>
         
         <div class="campo-grupo">
-            <label for="estiloSelect">1. Escolha o Estilo do Cenário:</label>
+            <label for="estiloSelect">1. Escolha o Estilo de Campanha:</label>
             <select id="estiloSelect">
+                <option value="clean" selected>Anúncio Comercial / Outdoor (Ideal p/ Óculos e Produtos)</option>
                 <option value="gourmet">Mármore Gourmet (Ideal p/ Doces e Bolos)</option>
-                <option value="rustico">Madeira Rústica (Ideal p/ Lanches e Cafés)</option>
-                <option value="clean" selected>Estúdio Clean (Ideal p/ Óculos, Roupas e Produtos)</option>
+                <option value="rustico">Café Rústico (Ideal p/ Lanches e Cafés)</option>
             </select>
         </div>
 
@@ -47,7 +47,7 @@
             <input type="file" id="fotoInput" accept="image/*" onchange="fotoAnexada()">
         </div>
 
-        <button onclick="enviarFoto()">Gerar Foto Profissional</button>
+        <button onclick="enviarFoto()">Gerar Anúncio Profissional</button>
 
         <p id="status"></p>
 
@@ -88,7 +88,7 @@
                 return;
             }
 
-            status.innerText = "O Estúdio CupomClic está criando a ambientação...";
+            status.innerText = "O Estúdio CupomClic está criando a arte via Flux (Fal.ai)...";
             status.style.color = "#d48a5c";
 
             const reader = new FileReader();
@@ -123,7 +123,6 @@
                     const fotoTextoBase64 = canvas.toDataURL('image/jpeg', 0.85);
 
                     try {
-                        // Enviamos a foto E o estilo escolhido para a API
                         const resposta = await fetch('/api/gerar', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },

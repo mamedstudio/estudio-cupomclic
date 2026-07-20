@@ -10,56 +10,63 @@ export default async function handler(req, res) {
       return res.status(400).json({ erro: 'Foto não encontrada.' });
     }
 
-    const apiKey = process.env.PHOTOROOM_API_KEY;
+    // Busca a chave FAL_KEY configurada na Vercel
+    const falKey = process.env.FAL_KEY;
 
-    if (!apiKey) {
-      return res.status(500).json({ erro: 'Chave PHOTOROOM_API_KEY não configurada na Vercel.' });
+    if (!falKey) {
+      return res.status(500).json({ 
+        erro: 'Chave FAL_KEY não encontrada na Vercel. Verifique o nome da variável de ambiente.' 
+      });
     }
 
-    // DICIONÁRIO DE PROMPTS: Mapeia a escolha do usuário para o prompt correto
-    const promptsDeArte = {
-      gourmet: 'On a clean white marble countertop, soft natural window light from the side, cozy bakery bokeh background out of focus, professional food photography',
-      rustico: 'On a dark rustic wooden table, warm cinematic studio light, soft depth of field, cozy cafe ambient background, professional food photography',
-      clean: 'On a smooth beige neutral surface, soft directional studio lighting, subtle realistic shadows, minimal clean aesthetic'
+    console.log("🚀 Conectando ao motor Flux (Fal.ai)...");
+
+    // Prompts de campanha direcionados para fotografia publicitária
+    const promptsDeCampanha = {
+      gourmet: 'High-end commercial food photography, gourmet dessert presentation on a luxury marble table in an upscale cafe, soft window light, shallow depth of field, 8k resolution, award winning advertisement',
+      rustico: 'Cozy artisanal cafe setting, warm cinematic golden hour lighting, coffee shop ambient background, depth of field, commercial advertisement photograph',
+      clean: 'Professional advertising campaign photoshoot, sleek product floating over a sunlit coastal highway, ocean view in the background, motion blur, dramatic lighting, 8k resolution, ultra-realistic'
     };
 
-    // Se o usuário não escolher nada, usamos o 'clean' como padrão de segurança
-    const promptCenario = promptsDeArte[estilo] || promptsDeArte.clean;
+    const promptEscolhido = promptsDeCampanha[estilo] || promptsDeCampanha.clean;
 
-    // Converte a imagem vinda do canvas para o formato binário
-    const base64Data = imagem.split(',')[1];
-    const buffer = Buffer.from(base64Data, 'base64');
-    const blob = new Blob([buffer], { type: 'image/jpeg' });
-
-    const formData = new FormData();
-    formData.append('imageFile', blob, 'produto.jpg');
-    formData.append('background.prompt', promptCenario);
-
-    const respostaIA = await fetch('https://image-api.photoroom.com/v2/edit', {
+    // Conexão direta com a API do Fal.ai usando o modelo Flux.1
+    const respostaIA = await fetch('https://fal.run/fal-ai/flux/dev/image-to-image', {
       method: 'POST',
       headers: {
-        'x-api-key': apiKey
+        'Authorization': `Key ${falKey}`,
+        'Content-Type': 'application/json'
       },
-      body: formData
+      body: JSON.stringify({
+        image_url: imagem,
+        prompt: promptEscolhido,
+        strength: 0.65,
+        guidance_scale: 3.5,
+        num_inference_steps: 28
+      })
     });
 
     if (!respostaIA.ok) {
       const textoErro = await respostaIA.text();
-      return res.status(500).json({ erro: `Erro na IA: ${textoErro}` });
+      console.error("Erro retornado pelo Fal.ai:", textoErro);
+      return res.status(500).json({ erro: `Erro no Fal.ai: ${textoErro}` });
     }
 
-    const arrayBuffer = await respostaIA.arrayBuffer();
-    const bufferResultado = Buffer.from(arrayBuffer);
-    const fotoFinalBase64 = `data:image/jpeg;base64,${bufferResultado.toString('base64')}`;
+    const dados = await respostaIA.json();
+    const fotoFinalUrl = dados.images?.[0]?.url;
+
+    if (!fotoFinalUrl) {
+      return res.status(500).json({ erro: 'A IA não retornou o link da imagem gerada.' });
+    }
 
     return res.status(200).json({ 
       sucesso: true,
-      mensagem: "O Estúdio CupomClic finalizou o seu anúncio com sucesso!",
-      imagemResultado: fotoFinalBase64
+      mensagem: "Anúncio gerado com sucesso via Flux (Fal.ai)!",
+      imagemResultado: fotoFinalUrl
     });
 
   } catch (erro) {
-    console.error("Erro no servidor:", erro);
-    return res.status(500).json({ erro: 'Erro interno ao processar a imagem.' });
+    console.error("Erro interno no backend:", erro);
+    return res.status(500).json({ erro: 'Erro interno no servidor ao processar a imagem.' });
   }
 }

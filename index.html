@@ -36,11 +36,12 @@
         <div class="campo-grupo">
             <label for="estiloSelect">1. Escolha o Estilo de Campanha:</label>
             <select id="estiloSelect">
-                <option value="clean" selected>Anúncio Comercial / Outdoor (Ideal p/ Óculos e Produtos)</option>
-                <option value="moda">Estúdio de Moda Editorial (Ideal p/ Roupas e Calçados)</option>
-                <option value="beleza">Spa & Beleza (Ideal p/ Cosméticos, Maquiagem e Skincare)</option>
-                <option value="gourmet">Mármore Gourmet (Ideal p/ Doces e Bolos)</option>
-                <option value="rustico">Café Rústico (Ideal p/ Lanches e Cafés)</option>
+                <option value="joias" selected>Joias & Luxo (Com Modelo / Editorial Vogue)</option>
+                <option value="clean">Anúncio Comercial / Outdoor (Óculos e Produtos)</option>
+                <option value="moda">Estúdio de Moda Editorial (Roupas e Calçados)</option>
+                <option value="beleza">Spa & Beleza (Cosméticos e Skincare)</option>
+                <option value="gourmet">Mármore Gourmet (Doces e Confeitaria)</option>
+                <option value="rustico">Café Rústico (Lanches e Cafés)</option>
             </select>
         </div>
 
@@ -90,7 +91,7 @@
                 return;
             }
 
-            status.innerText = "O Estúdio CupomClic está gerando o seu anúncio em alta definição...";
+            status.innerText = "O Estúdio CupomClic está gerando a arte em alta definição...";
             status.style.color = "#d48a5c";
 
             const reader = new FileReader();

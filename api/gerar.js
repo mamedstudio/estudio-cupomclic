@@ -16,22 +16,27 @@ export default async function handler(req, res) {
       return res.status(500).json({ erro: 'Chave FAL_KEY não configurada na Vercel.' });
     }
 
-    console.log("🚀 Enviando para openai/gpt-image-2/edit no Fal.ai com estilo:", estilo);
+    console.log("🚀 Processando no GPT-Image-2 (1080x1350 Instagram). Estilo:", estilo);
 
-    // Dicionário Otimizado com Prompt Específico para Modelo vestindo a Joia
+    // PROMPTS HIPER-REALISTAS COM MODELOS E FORMATO VERTICAL INSTAGRAM (4:5)
     const promptsRobustos = {
-      // NOVO PROMPT: Modelo elegante vestindo a joia
-      joias: 'High-fashion luxury editorial photography. Close-up portrait of an elegant female model wearing this gold necklace around her neck and collarbone. Glamour lighting, soft shadows, sophisticated dark luxury backdrop, Vogue magazine cover aesthetic, shot on 85mm portrait lens, f/2.0, cinematic depth of field, hyper-realistic, 8k.',
-      
-      clean: 'Professional advertising campaign photoshoot, sleek product floating over a sunlit coastal highway, ocean view in the background, motion blur, dramatic lighting, 8k resolution, ultra-realistic',
-      
-      moda: 'High-end fashion editorial product shot, resting on a minimalist matte concrete pedestal. Subtle warm spotlighting creating soft elegant shadows. Sophisticated neutral beige and light grey background, Vogue magazine cover aesthetic, cinematic lighting, highly detailed.',
-      
-      beleza: 'Luxury beauty and cosmetics product photography, resting on a polished rose quartz stone. Surrounded by shallow clear water ripples and soft silk fabric. Soft pastel pink and warm beige color palette, glowing luxury spa lighting, hyper-realistic macro photography.',
-      
-      gourmet: 'Award-winning gourmet food photography, resting on a luxury Italian white marble countertop. Soft morning natural sunlight streaming from the side creating appetizing highlights. Cozy upscale bakery blurred in the background, hyper-realistic, shot on 100mm macro lens, cinematic depth of field.',
-      
-      rustico: 'Artisanal cozy cafe product photography, resting on a dark rustic reclaimed wood table. Warm cinematic golden hour backlighting. Beautiful bokeh background featuring blurred warm cafe lights and coffee shop elements, hyper-realistic depth of field, 8k.'
+      // 1. JOIAS: Modelo de alta costura com joia no pescoço
+      joias: 'High-fashion luxury editorial portrait photography. Close-up portrait of an elegant female model wearing this gold necklace around her neck and collarbone. Glamour lighting, soft shadows, sophisticated dark luxury backdrop, Vogue magazine cover aesthetic, shot on 85mm portrait lens, f/2.0, cinematic depth of field, vertical 4:5 aspect ratio, 1080x1350 resolution, hyper-realistic, 8k.',
+
+      // 2. OUTDOOR/LIFESTYLE: Modelo usando os óculos/acessório em cenário de estrada/praia
+      clean: 'High-end commercial outdoor lifestyle campaign. Close-up portrait shot of an attractive model wearing or presenting this product outdoors on a sunlit coastal highway, ocean view background, golden hour natural light, motion blur, 85mm lens, f/2.8, vertical 4:5 portrait aspect ratio, 1080x1350 format, ultra-realistic commercial advertisement.',
+
+      // 3. MODA: Modelo vestindo a roupa em estúdio de revista
+      moda: 'Haute-couture fashion editorial campaign. Full-body or 3/4 shot of a professional fashion model wearing this exact clothing item. Clean minimalist modern studio backdrop with warm beige tones, Vogue magazine aesthetic, soft studio lighting, 85mm lens, vertical 4:5 aspect ratio, 1080x1350 format, highly detailed, photorealistic.',
+
+      // 4. BELEZA: Modelo segurando/usando o cosmético em ambiente spa
+      beleza: 'Luxury skincare and beauty advertisement. Close-up portrait of a stunning female model with glowing flawless skin holding or posing alongside this cosmetic product. Soft spa studio lighting, smooth silk and water ripple background, pastel color palette, macro photography, vertical 4:5 aspect ratio, 1080x1350 format, hyper-realistic.',
+
+      // 5. GOURMET: Apresentação gourmet refinada para doces/bolos
+      gourmet: 'Award-winning Michelin-star gourmet food photography. Appetizing food styling presentation resting on an Italian white marble table in a bright upscale bakery. Soft natural side window sunlight, shallow depth of field, 100mm macro lens, vertical 4:5 portrait aspect ratio, 1080x1350 format, hyper-realistic.',
+
+      // 6. RÚSTICO: Apresentação aconchegante para lanches/cafés
+      rustico: 'Artisanal cozy cafe food photography. Gourmet food presentation resting on a dark reclaimed oak wood table. Warm cinematic golden hour backlighting, beautiful bokeh background with warm cafe ambient lights, vertical 4:5 portrait aspect ratio, 1080x1350 format, 8k resolution.'
     };
 
     const promptEscolhido = promptsRobustos[estilo] || promptsRobustos.joias;
@@ -63,7 +68,7 @@ export default async function handler(req, res) {
 
     return res.status(200).json({ 
       sucesso: true,
-      mensagem: "Anúncio de alta conversão gerado com sucesso via GPT!",
+      mensagem: "Anúncio pronto para Instagram (1080x1350) gerado com sucesso!",
       imagemResultado: fotoFinalUrl
     });
 

@@ -10,27 +10,29 @@ export default async function handler(req, res) {
       return res.status(400).json({ erro: 'Foto não encontrada.' });
     }
 
-    // Busca a chave FAL_KEY configurada na Vercel
     const falKey = process.env.FAL_KEY;
 
     if (!falKey) {
       return res.status(500).json({ 
-        erro: 'Chave FAL_KEY não encontrada na Vercel. Verifique o nome da variável de ambiente.' 
+        erro: 'Chave FAL_KEY não encontrada na Vercel.' 
       });
     }
 
-    console.log("🚀 Conectando ao motor Flux (Fal.ai)...");
+    console.log("🚀 Conectando ao motor Flux (Fal.ai)... Estilo:", estilo);
 
-    // Prompts de campanha direcionados para fotografia publicitária
+    // Dicionário de Prompts Expandido com Moda e Beleza
     const promptsDeCampanha = {
       gourmet: 'High-end commercial food photography, gourmet dessert presentation on a luxury marble table in an upscale cafe, soft window light, shallow depth of field, 8k resolution, award winning advertisement',
       rustico: 'Cozy artisanal cafe setting, warm cinematic golden hour lighting, coffee shop ambient background, depth of field, commercial advertisement photograph',
-      clean: 'Professional advertising campaign photoshoot, sleek product floating over a sunlit coastal highway, ocean view in the background, motion blur, dramatic lighting, 8k resolution, ultra-realistic'
+      clean: 'Professional advertising campaign photoshoot, sleek product floating over a sunlit coastal highway, ocean view in the background, motion blur, dramatic lighting, 8k resolution, ultra-realistic',
+      // NOVO: Estilo Editorial de Moda
+      moda: 'High fashion editorial style, clean modern minimalist studio background with soft neutral elegant tones, professional studio lighting, soft shadows, Vogue magazine aesthetic, 8k resolution, photorealistic clothing e-commerce presentation',
+      // NOVO: Estilo Spa / Cosméticos
+      beleza: 'Luxury beauty and cosmetic product photography, resting on a smooth glossy surface with subtle silk and water ripple background, soft pastel pink and beige tones, glowing spa lighting, highly detailed reflection, 8k, photorealistic advertisement'
     };
 
     const promptEscolhido = promptsDeCampanha[estilo] || promptsDeCampanha.clean;
 
-    // Conexão direta com a API do Fal.ai usando o modelo Flux.1
     const respostaIA = await fetch('https://fal.run/fal-ai/flux/dev/image-to-image', {
       method: 'POST',
       headers: {
@@ -40,7 +42,7 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         image_url: imagem,
         prompt: promptEscolhido,
-        strength: 0.65,
+        strength: 0.65, // Ideal para manter os traços da roupa/produto
         guidance_scale: 3.5,
         num_inference_steps: 28
       })

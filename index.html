@@ -3,161 +3,161 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estúdio CupomClic - Fotos Profissionais com IA</title>
+    <title>Estúdio CupomClic</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', -apple-system, sans-serif; }
-        body { background-color: #0b192c; color: #ffffff; padding: 20px; display: flex; justify-content: center; min-height: 100vh; }
+        body { font-family: sans-serif; background-color: #0b192c; color: white; text-align: center; padding: 50px; }
+        .container { max-width: 500px; margin: 0 auto; background-color: #1a2a40; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .logo-marca { max-width: 250px; margin-bottom: 20px; border-radius: 8px; }
+        h1 { color: #d48a5c; margin-bottom: 10px; }
+        p { color: #8fa0b5; font-size: 14px; margin-bottom: 20px; }
         
-        .container { width: 100%; max-width: 650px; background: #1a2a40; padding: 30px; border-radius: 16px; border: 1px solid #d48a5c; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5); align-self: center; text-align: center; }
+        .campo-grupo { margin-bottom: 20px; text-align: left; }
+        label { font-size: 12px; color: #d48a5c; font-weight: bold; display: block; margin-bottom: 5px; }
+        select, input[type="file"] { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #3b9b9b; background-color: #0b192c; color: white; box-sizing: border-box; }
         
-        .logo { font-size: 22px; font-weight: 800; color: #d48a5c; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 4px; }
-        .tagline { color: #8fa0b5; font-size: 13px; margin-bottom: 25px; }
+        button { background-color: #3b9b9b; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; width: 100%; transition: background-color 0.3s; margin-top: 10px; }
+        button:hover { background-color: #2a7a7a; }
+        .btn-baixar { background-color: #d48a5c; margin-top: 15px; }
+        .btn-baixar:hover { background-color: #b37143; }
         
-        .campo { margin-bottom: 18px; text-align: left; }
-        label { color: #3b9b9b; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px; }
-        input, select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #3b9b9b; background: #0b192c; color: #ffffff; font-size: 14px; }
-        input:focus, select:focus { outline: none; border-color: #d48a5c; }
-        
-        button.btn-main { background: linear-gradient(135deg, #d48a5c 0%, #b37143 100%); color: #ffffff; border: none; padding: 14px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 10px; transition: 0.2s; }
-        button.btn-main:hover { opacity: 0.9; transform: translateY(-1px); }
-        button.btn-main:disabled { background: #555; cursor: not-allowed; opacity: 0.6; transform: none; }
-
-        /* ESTILOS DO LOADING (ANIMAÇÃO) */
-        .loading-box {
-            margin-top: 25px;
-            padding: 20px;
-            background: #0b192c;
-            border: 1px solid #d48a5c;
-            border-radius: 12px;
-        }
-
-        .spinner {
-            width: 45px;
-            height: 45px;
-            border: 4px solid rgba(212, 138, 92, 0.2);
-            border-top-color: #d48a5c;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 15px auto;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .loading-text {
-            color: #d48a5c;
-            font-weight: 700;
-            font-size: 15px;
-            animation: pulse 1.5s ease-in-out infinite;
-        }
-
-        .loading-subtext {
-            color: #8fa0b5;
-            font-size: 12px;
-            margin-top: 5px;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        /* CARD DE RESULTADO */
-        .result-box { margin-top: 25px; background: #0b192c; border: 1px solid rgba(59, 155, 155, 0.4); border-radius: 12px; padding: 15px; }
-        .result-img { width: 100%; height: auto; border-radius: 8px; border: 1px solid #3b9b9b; margin-top: 10px; }
-        
-        .btn-download { background: #3b9b9b; color: white; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px; margin-top: 12px; text-decoration: none; display: inline-block; }
-        .btn-download:hover { background: #2a7a7a; }
-
-        .hidden { display: none !important; }
+        #status { margin-top: 20px; font-weight: bold; color: #d48a5c; }
+        .resultado-container { margin-top: 30px; display: none; }
+        .resultado-img { max-width: 100%; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); border: 2px solid #d48a5c; }
+        .dica-mobile { font-size: 11px; color: #8fa0b5; margin-top: 8px; font-style: italic; }
     </style>
 </head>
 <body>
-
     <div class="container">
-        <div class="logo">📸 Estúdio CupomClic</div>
-        <div class="tagline">Geração de Fotos Profissionais para o Comércio Local</div>
-
-        <div class="campo">
-            <label>1. Nome do Produto:</label>
-            <input type="text" id="produtoInput" placeholder="Ex: Pizza de Calabresa com Borda Recheada">
-        </div>
-
-        <div class="campo">
-            <label>2. Estilo da Foto:</label>
+        <img src="logo.png" alt="Logo CupomClic" class="logo-marca">
+        
+        <h1>Estúdio CupomClic</h1>
+        <p>A inteligência artificial que transforma as fotos da sua loja.</p>
+        
+        <div class="campo-grupo">
+            <label for="estiloSelect">1. Escolha o Estilo de Campanha:</label>
             <select id="estiloSelect">
-                <option value="Estúdio Gastronômico com iluminação quente de restaurante">🍔 Gastronômico / Restaurante Premium</option>
-                <option value="Vitrine de Loja de Roupas moderna e iluminada">👗 Moda / Vitrine Conceito</option>
-                <option value="Foto Comercial limpa em estúdio com iluminação suave">📦 Produto Comercial (Fundo Estúdio)</option>
+                <option value="clean" selected>Anúncio Comercial / Outdoor (Ideal p/ Óculos e Produtos)</option>
+                <option value="moda">Estúdio de Moda Editorial (Ideal p/ Roupas e Calçados)</option>
+                <option value="beleza">Spa & Beleza (Ideal p/ Cosméticos, Maquiagem e Skincare)</option>
+                <option value="gourmet">Mármore Gourmet (Ideal p/ Doces e Bolos)</option>
+                <option value="rustico">Café Rústico (Ideal p/ Lanches e Cafés)</option>
             </select>
         </div>
 
-        <button class="btn-main" id="btnGerar" onclick="gerarFoto()">⚡ Criar Foto de Estúdio</button>
-
-        <!-- CAIXA DE LOADING (ROLETA + MENSAGEM) -->
-        <div id="loadingBox" class="loading-box hidden">
-            <div class="spinner"></div>
-            <div class="loading-text">Aguarde, estamos produzindo sua foto!</div>
-            <div class="loading-subtext">A Inteligência Artificial está preparando a iluminação e o cenário...</div>
+        <div class="campo-grupo">
+            <label for="fotoInput">2. Escolha a Foto do Produto:</label>
+            <input type="file" id="fotoInput" accept="image/*" onchange="fotoAnexada()">
         </div>
 
-        <!-- ÁREA DA FOTO GERADA -->
-        <div id="resultBox" class="result-box hidden">
-            <p style="color: #3b9b9b; font-size: 13px; font-weight: bold;">Sua foto ficou pronta! 🔥</p>
-            <img id="fotoResultado" src="" alt="Foto Gerada" class="result-img">
-            <a id="btnDownload" href="#" download="foto-cupomclic.jpg" class="btn-download">💾 Baixar Foto em Alta Resolução</a>
+        <button onclick="enviarFoto()">Gerar Anúncio Profissional</button>
+
+        <p id="status"></p>
+
+        <div id="resultadoBloco" class="resultado-container">
+            <h3>Seu Anúncio Profissional:</h3>
+            <img id="fotoResultado" src="" alt="Produto CupomClic" class="resultado-img">
+            
+            <button onclick="baixarFoto()" class="btn-baixar">Baixar Imagem no Celular</button>
+            <p class="dica-mobile">Dica: Você também pode pressionar e segurar o dedo na imagem para salvá-la!</p>
         </div>
     </div>
 
     <script>
-        async function gerarFoto() {
-            const produto = document.getElementById('produtoInput').value;
-            const estilo = document.getElementById('estiloSelect').value;
-            const btnGerar = document.getElementById('btnGerar');
-            const loadingBox = document.getElementById('loadingBox');
-            const resultBox = document.getElementById('resultBox');
-            const fotoResultado = document.getElementById('fotoResultado');
-            const btnDownload = document.getElementById('btnDownload');
+        function fotoAnexada() {
+            const input = document.getElementById('fotoInput');
+            const status = document.getElementById('status');
+            const bloco = document.getElementById('resultadoBloco');
+            
+            bloco.style.display = "none";
+            if (input.files.length > 0) {
+                status.innerText = "FOTO ANEXADA COM SUCESSO. CLIQUE EM GERAR";
+                status.style.color = "#3b9b9b";
+            } else {
+                status.innerText = "";
+            }
+        }
 
-            if (!produto) {
-                alert("Por favor, digite o nome do produto!");
+        function enviarFoto() {
+            const input = document.getElementById('fotoInput');
+            const estilo = document.getElementById('estiloSelect').value;
+            const status = document.getElementById('status');
+            const bloco = document.getElementById('resultadoBloco');
+            const imgResultado = document.getElementById('fotoResultado');
+            
+            if (!input.files[0]) {
+                status.innerText = "Nenhuma foto selecionada!";
+                status.style.color = "#d48a5c";
                 return;
             }
 
-            // 1. ATIVAR ESTADO DE LOADING E DESABILITAR O BOTÃO
-            btnGerar.disabled = true;
-            btnGerar.innerText = "⏳ Gerando...";
-            loadingBox.classList.remove('hidden');
-            resultBox.classList.add('hidden');
+            status.innerText = "O Estúdio CupomClic está gerando o seu anúncio em alta definição...";
+            status.style.color = "#d48a5c";
 
-            try {
-                // Chamada para a API Serverless na Vercel
-                const response = await fetch('/api/generate-photo', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ produto, estilo })
-                });
+            const reader = new FileReader();
+            reader.readAsDataURL(input.files[0]);
+            
+            reader.onload = function () {
+                const img = new Image();
+                img.src = reader.result;
+                
+                img.onload = async function() {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    
+                    const MAX_WIDTH = 1024;
+                    const MAX_HEIGHT = 1024;
+                    if (width > MAX_WIDTH || height > MAX_HEIGHT) {
+                        if (width > height) {
+                            height *= MAX_WIDTH / width;
+                            width = MAX_WIDTH;
+                        } else {
+                            width *= MAX_HEIGHT / height;
+                            height = MAX_HEIGHT;
+                        }
+                    }
+                    
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    const fotoTextoBase64 = canvas.toDataURL('image/jpeg', 0.85);
 
-                const data = await response.json();
+                    try {
+                        const resposta = await fetch('/api/gerar', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ imagem: fotoTextoBase64, estilo: estilo })
+                        });
+                        
+                        const resultado = await resposta.json();
+                        
+                        if (resultado.imagemResultado) {
+                            status.innerText = resultado.mensagem;
+                            status.style.color = "#3b9b9b";
+                            imgResultado.src = resultado.imagemResultado;
+                            bloco.style.display = "block";
+                        } else {
+                            status.innerText = resultado.erro || "Erro ao processar imagem.";
+                        }
+                    } catch (erro) {
+                        status.innerText = "Erro na comunicação com a IA.";
+                    }
+                };
+            };
+        }
 
-                if (data.sucesso && data.imageUrl) {
-                    // Exibe a imagem gerada
-                    fotoResultado.src = data.imageUrl;
-                    btnDownload.href = data.imageUrl;
-                    resultBox.classList.remove('hidden');
-                } else {
-                    alert(data.erro || "Erro ao gerar a foto. Tente novamente.");
-                }
-
-            } catch (err) {
-                alert("Erro de conexão com o servidor.");
-            } finally {
-                // 2. DESATIVAR LOADING E REABILITAR BOTÃO
-                loadingBox.classList.add('hidden');
-                btnGerar.disabled = false;
-                btnGerar.innerText = "⚡ Criar Foto de Estúdio";
-            }
+        function baixarFoto() {
+            const imgResultado = document.getElementById('fotoResultado');
+            if (!imgResultado.src) return;
+            
+            const linkTemporario = document.createElement('a');
+            linkTemporario.href = imgResultado.src;
+            linkTemporario.download = 'anuncio-cupomclic.jpg';
+            document.body.appendChild(linkTemporario);
+            linkTemporario.click();
+            document.body.removeChild(linkTemporario);
         }
     </script>
 </body>

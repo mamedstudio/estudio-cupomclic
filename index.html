@@ -19,7 +19,7 @@
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
     body { background-color: var(--bg-color); color: var(--text-main); min-height: 100vh; padding: 20px; display: flex; justify-content: center; align-items: flex-start; }
-    .container { width: 100%; max-width: 650px; background: var(--card-bg); border: 1px solid var(--accent-gold); border-radius: 16px; padding: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); margin-top: 20px; }
+    .container { width: 100%; max-width: 650px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); margin-top: 20px; }
     
     .logo-container { text-align: center; margin-bottom: 15px; }
     .logo-img { max-width: 200px; width: 100%; height: auto; border-radius: 8px; display: inline-block; }
@@ -36,7 +36,7 @@
     .btn-main:hover { opacity: 0.95; }
     .btn-main:disabled { opacity: 0.6; cursor: not-allowed; }
 
-    /* CAIXA DE LOADING ANIMADO */
+    /* LOADING ANIMADO */
     .loading-box { display: none; text-align: center; padding: 25px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 12px; margin-top: 25px; }
     .spinner { width: 45px; height: 45px; border: 4px solid var(--border-color); border-top: 4px solid var(--accent-gold); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 15px; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -60,7 +60,7 @@
     <p class="subtitle">Geração de Fotos Profissionais para o Comércio Local</p>
 
     <div class="form-group">
-      <label>1. NOME DO PRODUTO OU LINK DA FOTO:</label>
+      <label>1. NOME DO PRODUTO:</label>
       <input type="text" id="produto" placeholder="Ex: Pizza de Calabresa com Borda Recheada">
     </div>
 
@@ -78,14 +78,12 @@
 
     <button id="btn-gerar" class="btn-main" onclick="gerarFoto()">⚡ Criar Foto de Estúdio</button>
 
-    <!-- ANIMAÇÃO DE CARREGAMENTO (LOADING) -->
     <div id="loading-box" class="loading-box">
       <div class="spinner"></div>
-      <div class="loading-text">🎨 Renderizando foto em alta resolução (1080x1350)...</div>
-      <div class="loading-subtext">A Inteligência Artificial está montando a iluminação e o cenário do estúdio. Aguarde cerca de 10s.</div>
+      <div class="loading-text">🎨 Montando estúdio e iluminação (1080x1350)...</div>
+      <div class="loading-subtext">A IA está gerando sua imagem do zero. Aguarde cerca de 10 a 15 segundos.</div>
     </div>
 
-    <!-- RESULTADO DA IMAGEM GERADA -->
     <div id="results" class="results-container">
       <img id="foto-resultado" class="img-preview" src="" alt="Foto Gerada pela IA">
       <a id="btn-download" class="btn-download" href="#" download="estudio-cupomclic.jpg" target="_blank">⬇️ Baixar Foto em Alta Resolução (Instagram)</a>
@@ -103,12 +101,11 @@
       const btnDownload = document.getElementById('btn-download');
 
       if (!produto) {
-        return alert('Informe o nome do produto ou link da imagem!');
+        return alert('Digite o nome do produto!');
       }
 
-      // Ativa estado de carregamento
       btn.disabled = true;
-      btn.innerText = '⏳ Criando Foto de Estúdio...';
+      btn.innerText = '⏳ Criando Foto...';
       results.style.display = 'none';
       loadingBox.style.display = 'block';
 
@@ -117,26 +114,24 @@
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
-            imagem: produto, 
+            produto: produto, 
             estilo: estilo 
           })
         });
 
         const data = await res.json();
 
-        if (data.sucesso && (data.imageUrl || data.imagemResultado)) {
-          const finalUrl = data.imageUrl || data.imagemResultado;
-          imgPreview.src = finalUrl;
-          btnDownload.href = finalUrl;
+        if (data.sucesso && data.imageUrl) {
+          imgPreview.src = data.imageUrl;
+          btnDownload.href = data.imageUrl;
           results.style.display = 'block';
         } else {
-          alert(data.erro || 'Erro ao gerar foto no servidor.');
+          alert(data.erro || 'Erro ao gerar imagem.');
         }
       } catch (err) {
         console.error("Erro na requisição:", err);
-        alert('Erro de conexão com o servidor ao gerar a imagem.');
+        alert('Erro de conexão ao gerar imagem.');
       } finally {
-        // Restaura botões e oculta animação de loading
         loadingBox.style.display = 'none';
         btn.disabled = false;
         btn.innerText = '⚡ Criar Foto de Estúdio';

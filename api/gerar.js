@@ -25,19 +25,27 @@ export default async function handler(req, res) {
 
     const cleanKey = rawKey.trim().replace(/^Key\s+/i, '');
 
-    // PROMPTS HIPER-REALISTAS DE ESTÚDIO PARA EDITAR A FOTO ENVIADA
+    // INSTRUÇÃO FORTE PARA EVITAR E REMOVER QUALQUER TEXTO
+    const semTexto = 'IMPORTANT: Generate a perfectly clean image. ABSOLUTELY NO TEXT, NO LETTERS, NO LOGOS, NO WATERMARKS, AND NO WORDS. If there is any text in the original image, erase it completely and replace it with natural textures.';
+
+    // PROMPTS DE ESTÚDIO ATUALIZADOS (Sem a palavra "Vogue")
     const promptsRobustos = {
-      gourmet: 'Award-winning Michelin-star gourmet food photography. Transforming the provided product photo into an appetizing high-end food presentation resting on an Italian white marble table in a bright upscale restaurant. Soft natural side window sunlight, shallow depth of field, 100mm macro lens, 1080x1350 vertical format, hyper-realistic, 8k.',
-      joias: 'High-fashion luxury editorial portrait photography. Transform the provided product into a stunning high-end advertisement, placed elegantly on a dark luxury velvet pedestal with glamour lighting, soft shadows, Vogue magazine aesthetic, hyper-realistic 8k.',
-      moda: 'Haute-couture fashion studio editorial campaign. Transform the provided clothing/item into a high-end commercial photo in a minimalist modern studio backdrop with warm beige tones, Vogue magazine aesthetic, soft studio lighting, 8k photorealistic.',
-      beleza: 'Luxury skincare and beauty advertisement. Place the provided cosmetic product in a soft spa studio lighting setting with smooth silk and water ripple background, macro photography, 1080x1350 format, hyper-realistic.',
-      clean: 'High-end commercial outdoor lifestyle campaign. Transform the provided product into an outdoor photo on a sunlit coastal setting, golden hour natural light, 85mm lens, ultra-realistic commercial advertisement.',
-      rustico: 'Artisanal cozy cafe food photography. Transform the provided food item resting on a dark reclaimed oak wood table, warm cinematic golden backlighting, beautiful ambient lights, 8k.'
+      gourmet: `Award-winning Michelin-star gourmet food photography. Transforming the provided product photo into an appetizing high-end food presentation resting on an Italian white marble table in a bright upscale restaurant. Soft natural side window sunlight, shallow depth of field, 100mm macro lens, hyper-realistic, 8k. ${semTexto}`,
+      
+      joias: `High-fashion luxury editorial portrait photography. Transform the provided product into a stunning high-end advertisement, placed elegantly on a dark luxury velvet pedestal with glamour lighting, soft shadows, high-end editorial aesthetic, hyper-realistic 8k. ${semTexto}`,
+      
+      moda: `Haute-couture fashion studio editorial campaign. Transform the provided clothing/item into a high-end commercial photo in a minimalist modern studio backdrop with warm beige tones, premium studio aesthetic, soft studio lighting, 8k photorealistic. ${semTexto}`,
+      
+      beleza: `Luxury skincare and beauty advertisement. Place the provided cosmetic product in a soft spa studio lighting setting with smooth silk and water ripple background, macro photography, hyper-realistic. ${semTexto}`,
+      
+      clean: `High-end commercial outdoor lifestyle campaign. Transform the provided product into an outdoor photo on a sunlit coastal setting, golden hour natural light, 85mm lens, ultra-realistic commercial advertisement. ${semTexto}`,
+      
+      rustico: `Artisanal cozy cafe food photography. Transform the provided food item resting on a dark reclaimed oak wood table, warm cinematic golden backlighting, beautiful ambient lights, 8k. ${semTexto}`
     };
 
     const promptEscolhido = promptsRobustos[estilo] || promptsRobustos.gourmet;
 
-    console.log("🚀 Enviando foto amadora para transformação no Fal.ai (GPT-Image-2 Edit)...");
+    console.log("🚀 Enviando foto amadora para transformação no Fal.ai. Estilo:", estilo);
 
     // Requisita a API de edição do Fal.ai
     const respostaIA = await fetch('https://fal.run/openai/gpt-image-2/edit', {

@@ -25,16 +25,23 @@ export default async function handler(req, res) {
 
     const cleanKey = rawKey.trim().replace(/^Key\s+/i, '');
 
-    // INSTRUÇÃO FORTE PARA EVITAR E REMOVER QUALQUER TEXTO
-    const semTexto = 'IMPORTANT: Generate a perfectly clean image. ABSOLUTELY NO TEXT, NO LETTERS, NO LOGOS, NO WATERMARKS, AND NO WORDS. If there is any text in the original image, erase it completely and replace it with natural textures.';
+    // TRAVA ANTI-TEXTO
+    const semTexto = 'IMPORTANT: Generate a perfectly clean image. ABSOLUTELY NO TEXT, NO LETTERS, NO LOGOS, NO WATERMARKS, AND NO WORDS. If there is any text in the original image, erase it completely.';
 
-    // PROMPTS DE ESTÚDIO ATUALIZADOS (Sem a palavra "Vogue")
+    // PROMPTS COM SELEÇÃO DE GÊNERO E OPÇÃO SEM MODELO
     const promptsRobustos = {
       gourmet: `Award-winning Michelin-star gourmet food photography. Transforming the provided product photo into an appetizing high-end food presentation resting on an Italian white marble table in a bright upscale restaurant. Soft natural side window sunlight, shallow depth of field, 100mm macro lens, hyper-realistic, 8k. ${semTexto}`,
       
       joias: `High-fashion luxury editorial portrait photography. Transform the provided product into a stunning high-end advertisement, placed elegantly on a dark luxury velvet pedestal with glamour lighting, soft shadows, high-end editorial aesthetic, hyper-realistic 8k. ${semTexto}`,
       
-      moda: `Haute-couture fashion studio editorial campaign. Transform the provided clothing/item into a high-end commercial photo in a minimalist modern studio backdrop with warm beige tones, premium studio aesthetic, soft studio lighting, 8k photorealistic. ${semTexto}`,
+      // 👗 MODA FEMININA
+      moda_feminina: `Haute-couture fashion studio editorial campaign. Transform the provided clothing item, wearing it naturally on an elegant professional female fashion model. Minimalist modern studio backdrop with warm beige tones, premium studio lighting, soft shadows, 8k photorealistic. ${semTexto}`,
+      
+      // 👔 MODA MASCULINA
+      moda_masculina: `Haute-couture fashion studio editorial campaign. Transform the provided clothing item, wearing it naturally on a handsome professional male fashion model. Sleek modern studio backdrop with neutral gray/dark tones, masculine studio lighting, 8k photorealistic. ${semTexto}`,
+      
+      // 🧥 MODA SEM MODELO (GHOST MANNEQUIN / STUDIO PRODUCT)
+      moda_produto: `High-end commercial fashion product photography. Transform the provided clothing item into a perfectly styled studio display on a invisible ghost mannequin or elegant hanger. Clean minimalist studio wall, perfectly balanced studio lighting, crisp details, no human models, 8k photorealistic. ${semTexto}`,
       
       beleza: `Luxury skincare and beauty advertisement. Place the provided cosmetic product in a soft spa studio lighting setting with smooth silk and water ripple background, macro photography, hyper-realistic. ${semTexto}`,
       
@@ -47,7 +54,6 @@ export default async function handler(req, res) {
 
     console.log("🚀 Enviando foto amadora para transformação no Fal.ai. Estilo:", estilo);
 
-    // Requisita a API de edição do Fal.ai
     const respostaIA = await fetch('https://fal.run/openai/gpt-image-2/edit', {
       method: 'POST',
       headers: {

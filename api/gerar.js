@@ -11,11 +11,11 @@ export default async function handler(req, res) {
       try { body = JSON.parse(body); } catch(e){}
     }
 
-    const produto = body?.produto || body?.nome || '';
+    const imagem = body?.imagem;
     const estilo = body?.estilo || 'gourmet';
 
-    if (!produto || produto.trim() === '') {
-      return res.status(400).json({ erro: 'Por favor, informe o nome do produto.' });
+    if (!imagem) {
+      return res.status(400).json({ erro: 'Por favor, envie ou selecione uma foto para transformar.' });
     }
 
     const rawKey = process.env.FAL_KEY;
@@ -25,50 +25,44 @@ export default async function handler(req, res) {
 
     const cleanKey = rawKey.trim().replace(/^Key\s+/i, '');
 
-    // Prompts de estilo ambiente para o estúdio
-    const estilosFotograficos = {
-      gourmet: 'Award-winning Michelin-star gourmet food photography, appetizing styling on a white marble table in a luxury restaurant, warm natural sunlight, shallow depth of field, 85mm macro lens, hyper-realistic, 8k resolution.',
-      joias: 'High-fashion luxury editorial studio photography, glamour lighting, soft shadows, sophisticated dark luxury backdrop, Vogue cover aesthetic, macro lens, hyper-realistic.',
-      moda: 'Haute-couture fashion studio editorial photography, modern minimalist beige backdrop, soft studio lighting, Vogue aesthetic, 8k resolution.',
-      beleza: 'Luxury cosmetics and skincare beauty product advertisement photography, soft spa lighting, smooth silk and water ripple background, pastel colors, hyper-realistic.',
-      clean: 'High-end commercial outdoor lifestyle campaign, golden hour natural sunlight, coastal highway background, 85mm lens, ultra-realistic commercial advertisement.',
-      rustico: 'Artisanal cozy cafe food presentation, resting on a dark reclaimed oak wood table, warm cinematic golden backlighting, beautiful bokeh background, 8k.'
+    // PROMPTS HIPER-REALISTAS DE ESTÚDIO PARA EDITAR A FOTO ENVIADA
+    const promptsRobustos = {
+      gourmet: 'Award-winning Michelin-star gourmet food photography. Transforming the provided product photo into an appetizing high-end food presentation resting on an Italian white marble table in a bright upscale restaurant. Soft natural side window sunlight, shallow depth of field, 100mm macro lens, 1080x1350 vertical format, hyper-realistic, 8k.',
+      joias: 'High-fashion luxury editorial portrait photography. Transform the provided product into a stunning high-end advertisement, placed elegantly on a dark luxury velvet pedestal with glamour lighting, soft shadows, Vogue magazine aesthetic, hyper-realistic 8k.',
+      moda: 'Haute-couture fashion studio editorial campaign. Transform the provided clothing/item into a high-end commercial photo in a minimalist modern studio backdrop with warm beige tones, Vogue magazine aesthetic, soft studio lighting, 8k photorealistic.',
+      beleza: 'Luxury skincare and beauty advertisement. Place the provided cosmetic product in a soft spa studio lighting setting with smooth silk and water ripple background, macro photography, 1080x1350 format, hyper-realistic.',
+      clean: 'High-end commercial outdoor lifestyle campaign. Transform the provided product into an outdoor photo on a sunlit coastal setting, golden hour natural light, 85mm lens, ultra-realistic commercial advertisement.',
+      rustico: 'Artisanal cozy cafe food photography. Transform the provided food item resting on a dark reclaimed oak wood table, warm cinematic golden backlighting, beautiful ambient lights, 8k.'
     };
 
-    const estiloPrompt = estilosFotograficos[estilo] || estilosFotograficos.gourmet;
-    
-    // INJETA O NOME DO PRODUTO NO PROMPT FINAL
-    const promptFinal = `Professional high-end commercial studio product photograph of ${produto}. ${estiloPrompt}, vertical 4:5 aspect ratio, 1080x1350 resolution.`;
+    const promptEscolhido = promptsRobustos[estilo] || promptsRobustos.gourmet;
 
-    console.log("🚀 Criando foto no Fal.ai (Flux Dev). Produto:", produto, "| Estilo:", estilo);
+    console.log("🚀 Enviando foto amadora para transformação no Fal.ai (GPT-Image-2 Edit)...");
 
-    // Chamada oficial Text-to-Image (Flux Dev)
-    const respostaIA = await fetch('https://fal.run/fal-ai/flux/dev', {
+    // Requisita a API de edição do Fal.ai
+    const respostaIA = await fetch('https://fal.run/openai/gpt-image-2/edit', {
       method: 'POST',
       headers: {
         'Authorization': `Key ${cleanKey}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        prompt: promptFinal,
-        image_size: {
-          width: 1080,
-          height: 1350
-        }
+        image_urls: [imagem],
+        prompt: promptEscolhido
       })
     });
 
     if (!respostaIA.ok) {
       const textoErro = await respostaIA.text();
       console.error("Erro no Fal.ai:", textoErro);
-      return res.status(500).json({ erro: `Fal.ai recusou [Código ${respostaIA.status}]: ${textoErro}` });
+      return res.status(500).json({ erro: `Fal.ai recusou a imagem [Código ${respostaIA.status}]: ${textoErro}` });
     }
 
     const dados = await respostaIA.json();
     const fotoFinalUrl = dados.images?.[0]?.url || dados.image?.url || dados.url;
 
     if (!fotoFinalUrl) {
-      return res.status(500).json({ erro: 'A IA não retornou o link da imagem.' });
+      return res.status(500).json({ erro: 'A IA não retornou o link da imagem editada.' });
     }
 
     return res.status(200).json({
@@ -78,6 +72,6 @@ export default async function handler(req, res) {
 
   } catch (erro) {
     console.error("Erro interno no backend:", erro);
-    return res.status(500).json({ erro: `Erro ao processar imagem: ${erro.message}` });
+    return res.status(500).json({ erro: `Erro interno ao processar a foto: ${erro.message}` });
   }
 }
